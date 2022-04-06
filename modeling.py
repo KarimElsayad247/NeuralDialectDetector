@@ -7,7 +7,6 @@ import torch
 from tqdm import tqdm, trange
 import numpy as np
 import os
-import neptune
 import random 
 import model as model_classes
 from torch.optim.lr_scheduler import CyclicLR, LambdaLR
@@ -41,7 +40,6 @@ class InvSqrtLR(LambdaLR):
             it = 1 + (iteration - self.num_warmup) // self.mini_epoch_sz
             fac = self.max_factor / max(1.0, np.sqrt(it / self.temp))
             fac = max(fac, self.min_factor)
-        neptune.log_metric('InvSqrtLR_factor', x=global_step, y=fac)
         return fac
 
 class Trainer():
@@ -49,10 +47,7 @@ class Trainer():
         self.configs = read_yaml_file(config_file_path)
         self.model_name_path = self.configs["model_name_path"]
         logging.basicConfig(filename=os.path.join(self.configs["checkpointing_path"], 'training_log.log'), level=logging.DEBUG)
-        if self.configs["use_neptune"]:
-            neptune.init(project_qualified_name='mohamedgabr96/sandbox',
-                api_token=self.configs["neptuneaiAPI"],
-                )
+
 
     @staticmethod
     def set_seeds(seed_val):
@@ -63,19 +58,8 @@ class Trainer():
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-    def log_single_metrics_to_neptune(self):
-        neptune.log_metric('batch_size', self.configs["batch_size"])
-        neptune.log_metric('classif_dropout_rate', self.configs["classif_dropout_rate"])
-        neptune.log_metric('initial_learning_rate', self.configs["initial_learning_rate"])
-        neptune.log_metric('adam_epsilon', self.configs["adam_epsilon"])
-        neptune.log_metric('warmup_steps', self.configs["warmup_steps"])
-        neptune.log_metric('num_epochs', self.configs["num_epochs"])
-        neptune.log_metric('masking_percentage', self.configs["masking_percentage"])
 
     def train(self):
-        if self.configs["use_neptune"]:
-            neptune.create_experiment(name=self.configs["neptune_experiment_name"])
-            self.log_single_metrics_to_neptune()
         tokenizer = AutoTokenizer.from_pretrained(self.model_name_path)
         model_config = AutoConfig.from_pretrained(self.model_name_path)
 
@@ -149,12 +133,7 @@ class Trainer():
                 loss.backward()
 
                 training_loss += loss.item()
-                if self.configs["use_neptune"]:
-                    neptune.log_metric('train_loss', x=global_step, y=loss.item())
-                    neptune.log_metric('learning_rate_body', x=global_step, y=optimizer.param_groups[0]['lr'])
-                    if len(optimizer.param_groups) > 1:
-                        neptune.log_metric('learning_rate_head', x=global_step, y=optimizer.param_groups[1]['lr'])
-
+       
                 optimizer.step()
                 scheduler.step()
                 model.zero_grad()
@@ -162,10 +141,7 @@ class Trainer():
 
                 if global_step % self.configs["improvement_check_freq"] == 0:
                     curr_dev_f1, dev_accuracy, curr_dev_loss = evaluate_predictions(model, dev_loader, self.configs["model_class"], device=self.configs["device"])
-                    if self.configs["use_neptune"]:
-                        neptune.log_metric('dev_loss', x=global_step, y=curr_dev_loss)
-                        neptune.log_metric('dev_accuracy', x=global_step, y=dev_accuracy)
-                        neptune.log_metric('dev_f1', x=global_step, y=curr_dev_f1)
+         
                     early_stop_count_patience += 1
 
                 if self.configs["early_stopping"] and early_stop_count_patience > self.configs["early_stopping_patience"]:
@@ -195,10 +171,7 @@ class Trainer():
         else:
             final_dev_accuracy = 0
 
-        if self.configs["use_neptune"]:
-            neptune.log_metric('dev_loss', x=global_step, y=final_dev_loss)
-            neptune.log_metric('dev_accuracy', x=global_step, y=final_dev_accuracy)
-            neptune.log_metric('dev_f1', x=global_step, y=final_dev_f1)
+
             
         isTest_flag_for_dev_train = not (no_labels == self.configs["num_labels"])
 
@@ -296,8 +269,7 @@ class Trainer():
         dict_of_seed_results["Agg"] = aggregation_dict
 
         save_json(os.path.join(self.configs["checkpointing_path"], "final_scores.json"), dict_of_seed_results)
-        if self.configs["use_neptune"]:
-            neptune.stop()
+
         return dict_of_seed_results
 
 
