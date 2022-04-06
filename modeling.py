@@ -213,7 +213,7 @@ class Trainer():
 
     def evaluate_from_path(self, model_path, evaluate_on_train=False):
         dict_of_results = {}
-
+        model_path = self.configs["num_labels"]
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model_config = AutoConfig.from_pretrained(model_path)
 
