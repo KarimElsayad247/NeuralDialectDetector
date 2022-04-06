@@ -7,7 +7,7 @@ if __name__ == "__main__":
     
 #     classes_22 for province while classes_12 is for country
     # path = "NADI2021_DEV.1.0/NADI2021_DEV.1.0/Subtask_1.2+2.2_DA/DA_dev_labeled.tsv"
-    path = "NADI2021_DEV.1.0/NADI2021_DEV.1.0/Subtask_1.1+2.1_DA/DA_dev_labeled.tsv"
+    path = "/content/NADI2021_DEV.1.0/NADI2021_DEV.1.0/Subtask_1.1+2.1_DA/DA_dev_labeled.tsv"
     df = pd.read_csv(path, delimiter='\t')
     class_name = "classes_12.txt"
     labels_1 = sorted(df["#3_country_label"].unique().tolist())
