@@ -232,10 +232,10 @@ class Trainer():
         model.to(self.configs["device"])
 
         final_dev_f1, final_dev_accuracy, final_dev_loss, y_true_dev, y_pred_dev, sentence_id_dev, logits_list_dev = evaluate_predictions(model, dev_loader, self.configs["model_class"], device=self.configs["device"], return_pred_lists=True, isTest=isTest_flag_for_dev_train)
-        dump_predictions(sentence_id_dev, logits_list_dev, y_pred_dev, y_true_dev, os.path.join(model_path, "predictions_dev.tsv"))
+#         dump_predictions(sentence_id_dev, logits_list_dev, y_pred_dev, y_true_dev, os.path.join(model_path, "predictions_dev.tsv"))
         
         final_test_f1, final_test_accuracy, final_test_loss, y_true_test, y_pred_test, sentence_id_test, logits_list_test = evaluate_predictions(model, test_loader, self.configs["model_class"], device=self.configs["device"], return_pred_lists=True, isTest=True)
-        dump_predictions(sentence_id_test, logits_list_test, y_pred_test, y_true_test, os.path.join(model_path, "predictions_test.tsv"))
+#         dump_predictions(sentence_id_test, logits_list_test, y_pred_test, y_true_test, os.path.join(model_path, "predictions_test.tsv"))
 
         dict_of_results["DEV"] = {"F1": final_dev_f1, "Accuracy": final_dev_accuracy, "Loss": final_dev_loss} 
         dict_of_results["TEST"] = {"F1": final_test_f1, "Accuracy": final_test_accuracy, "Loss": final_test_loss}
