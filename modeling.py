@@ -211,9 +211,9 @@ class Trainer():
         logger.info(f"Training with multiple seeds ended.. Final aggregation of dev scores {final_aggregation}")
         return np.mean(dev_accuracy_list), model_pathes
 
-    def evaluate_from_path(self, model_path, evaluate_on_train=False):
+    def evaluate_from_path(self, evaluate_on_train=False):
         dict_of_results = {}
-        model_path = self.configs["num_labels"]
+        model_path = self.configs["model_name_path"]
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model_config = AutoConfig.from_pretrained(model_path)
 
@@ -281,4 +281,6 @@ if __name__ == "__main__":
     trainer_class = Trainer(config_file_path=config_file_path)
     # trainer_class.train()
     # trainer_class.train_with_multiple_seeds(3)
-    trainer_class.train_and_evaluate_with_multiple_seeds(1, seeds_from_config=True, eval_on_train=False)
+    # trainer_class.train_and_evaluate_with_multiple_seeds(1, seeds_from_config=True, eval_on_train=False)
+    output = trainer_class.evaluate_from_path(evaluate_on_train=False)
+    print(output)
