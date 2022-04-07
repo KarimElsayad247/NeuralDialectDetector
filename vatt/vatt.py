@@ -61,7 +61,7 @@ class SelfAttention(nn.Module):
             key_size = self.nb_layers * 2
             if self.positional_keys_mode == 'random':
                 self.StaticKeys = [
-                    T.rand(key_size) # .cuda()
+                    T.rand(key_size).cuda() # .cuda()
                     for _ in range(self.nb_layers)
                 ]
             elif self.positional_keys_mode == 'sinosoid':
@@ -73,7 +73,7 @@ class SelfAttention(nn.Module):
                     enc = di * ilayer
                     enc[0::2].sin_()
                     enc[1::2].cos_()
-                    self.StaticKeys.append(enc) # .cuda()
+                    self.StaticKeys.append(enc.cuda()) # .cuda()
             else:
                 raise KeyError(f"Unknown positional key mode: {self.positional_keys_mode}.")
             shared_key_transform = EnhancedLinear(key_size, self.hidden_size)
