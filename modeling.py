@@ -276,7 +276,7 @@ class Trainer():
 if __name__ == "__main__":
 
     import sys
-    config_file_path = "config.yaml"  # sys.argv[1]
+    config_file_path = "/content/NeuralDialectDetector/config.yaml"  # sys.argv[1]
 
     trainer_class = Trainer(config_file_path=config_file_path)
     # trainer_class.train()
