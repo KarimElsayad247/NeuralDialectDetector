@@ -7,11 +7,11 @@ if __name__ == "__main__":
     
 #     classes_22 for province while classes_12 is for country
     # path = "NADI2021_DEV.1.0/NADI2021_DEV.1.0/Subtask_1.2+2.2_DA/DA_dev_labeled.tsv"
-    path = "/content/NADI2021_DEV.1.0/NADI2021_DEV.1.0/Subtask_1.2+2.2_DA/DA_train_labeled.tsv"
-    df = pd.read_csv(path, delimiter='\t')
+    path = "../qadi/DA_dev_labeled.tsv"
+    df = pd.read_csv(path, delimiter='\t', lineterminator="\n")
     class_name = "classes_12.txt"
-    labels_1 = sorted(df["#3_country_label"].unique().tolist())
-    labels_2 = sorted(df["#4_province_label"].unique().tolist())
+    labels_1 = sorted(df["country_label"].unique().tolist())
+    labels_2 = sorted(df["province_label"].unique().tolist())
 
     print(f"n1={len(labels_1)} | n2={len(labels_2)}")
 

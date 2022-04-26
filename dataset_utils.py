@@ -71,7 +71,7 @@ def parse_data(path_to_file, separator="\t", regional_mapping_content=None, clas
     with open(path_to_file, encoding="utf-8") as file_open:
         lines = file_open.readlines()
   
-    lines_split = [line.strip().split("\t")[0:4] for line in lines[1:]]    
+    lines_split = [line.strip().split("\t")[0:4] for line in lines[1:]]
 
     if regional_mapping_content is not None:
         lines_split = [(x[0], x[1], regional_mapping_content[x[2]]) for x in lines_split]
@@ -108,16 +108,23 @@ def prepare_random_sampler(classes_list):
     sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
     return sampler
 
-def parse_and_generate_loader(path_to_data_folder, tokenizer, params, classes_list, split_set="train", locale="ar", random_sampler=True, masking_percentage=0.2, class_to_filter=None, regional_mapping=None, filter_w_indexes=None, pred_class=-1, max_seq_len=128, balance_data_max_examples=None, is_province=False, is_MSA=False, handle_imbalance_sampler=False):
+def parse_and_generate_loader(path_to_data_folder, tokenizer, params, classes_list, split_set="train", locale="ar",
+                              random_sampler=True, masking_percentage=0.2, class_to_filter=None, regional_mapping=None,
+                              filter_w_indexes=None, pred_class=-1, max_seq_len=128, balance_data_max_examples=None,
+                              is_province=False, is_MSA=False, handle_imbalance_sampler=False):
     index_path = os.path.join(filter_w_indexes, f"predictions_{split_set}.tsv") if filter_w_indexes is not None else None
     
     arabic_type = "MSA" if is_MSA else "DA"
-    data_examples = parse_data(os.path.join(path_to_data_folder, f"{arabic_type}_{split_set}_labeled.tsv"), regional_mapping_content=regional_mapping, class_to_filter=class_to_filter, filter_w_indexes=index_path, pred_class=pred_class)
+    data_examples = parse_data(os.path.join(path_to_data_folder, f"{arabic_type}_{split_set}_labeled.tsv"),
+                               regional_mapping_content=regional_mapping, class_to_filter=class_to_filter,
+                               filter_w_indexes=index_path, pred_class=pred_class)
     
     if balance_data_max_examples is not None:
         data_examples = balance_data(data_examples, balance_data_max_examples)
 
-    dataset, imbalance_handling_sampler = load_and_cache_examples(data_examples, tokenizer, classes_list, is_province=is_province, max_seq_len=max_seq_len, masking_percentage=masking_percentage)
+    dataset, imbalance_handling_sampler = load_and_cache_examples(data_examples, tokenizer, classes_list,
+                                                                  is_province=is_province, max_seq_len=max_seq_len,
+                                                                  masking_percentage=masking_percentage)
     if handle_imbalance_sampler:
         data_sampler = imbalance_handling_sampler
     else:
@@ -138,9 +145,29 @@ def parse_and_generate_loaders(path_to_data_folder, tokenizer, batch_size=2, mas
         classes_list.sort()
         print("Classes that will run: ")
         print(classes_list)
-    training_generator = parse_and_generate_loader(path_to_data_folder, tokenizer, params, classes_list, split_set="train", locale="ar", masking_percentage=masking_percentage, class_to_filter=class_to_filter, regional_mapping=regional_mapping_content, max_seq_len=max_seq_len, balance_data_max_examples=balance_data_max_examples, is_province=is_province, is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
-    dev_generator = parse_and_generate_loader(path_to_data_folder, tokenizer, params_dev, classes_list, split_set="dev", locale="ar", masking_percentage=masking_percentage, class_to_filter=class_to_filter, regional_mapping=regional_mapping_content, max_seq_len=max_seq_len, is_province=is_province, is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
-    test_generator = parse_and_generate_loader(path_to_data_folder, tokenizer, params_dev, classes_list, split_set="dev", locale="ar", masking_percentage=masking_percentage, class_to_filter=class_to_filter, regional_mapping=regional_mapping_content, filter_w_indexes=filter_w_indexes, pred_class=pred_class, max_seq_len=max_seq_len, is_province=is_province, is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
+    training_generator = parse_and_generate_loader(
+        path_to_data_folder, tokenizer, params, classes_list, split_set="train",
+        locale="ar", masking_percentage=masking_percentage, class_to_filter=class_to_filter,
+        regional_mapping=regional_mapping_content, max_seq_len=max_seq_len,
+        balance_data_max_examples=balance_data_max_examples, is_province=is_province,
+        is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
+
+    dev_generator = parse_and_generate_loader(
+          path_to_data_folder, tokenizer, params_dev,
+          classes_list, split_set="dev", locale="ar",
+          masking_percentage=masking_percentage,
+          class_to_filter=class_to_filter,
+          regional_mapping=regional_mapping_content,
+          max_seq_len=max_seq_len, is_province=is_province,
+          is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
+    test_generator = parse_and_generate_loader(path_to_data_folder, tokenizer,
+           params_dev, classes_list, split_set="dev",
+           locale="ar", masking_percentage=masking_percentage,
+           class_to_filter=class_to_filter,
+           regional_mapping=regional_mapping_content,
+           filter_w_indexes=filter_w_indexes, pred_class=pred_class,
+           max_seq_len=max_seq_len, is_province=is_province,
+           is_MSA=is_MSA, handle_imbalance_sampler=sampler_imbalance)
 
     return training_generator, dev_generator, test_generator, len(classes_list), None
 

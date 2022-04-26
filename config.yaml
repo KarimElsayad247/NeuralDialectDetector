@@ -5,7 +5,7 @@ bottleneck_dim: 384
 checkpoint_on_improvement: true
 checkpointing_freq: 1
 checkpointing_on: false
-checkpointing_path: /content/checkpoints_marbert
+checkpointing_path: checkpointing
 class_index: -1
 classif_dropout_rate: 0.3
 current_adapter_to_train: 6
@@ -26,7 +26,7 @@ masking_percentage: 0
 max_ex_per_class: null
 max_sequence_length: 100
 model_class: ArabicDialectBERT
-model_name_path: /content/UBC-NLP/MARBERT
+model_name_path: /content/drive/MyDrive/NLP_Project/Neural Dialect Detector/Neural Dialect Detector Checkpoints/MARBERT_DA_Country_Adapters_VAtt
 neptune_experiment_name: MARBERT_DA_Country_100
 neptuneaiAPI: eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vdWkubmVwdHVuZS5haSIsImFwaV91cmwiOiJodHRwczovL3VpLm5lcHR1bmUuYWkiLCJhcGlfa2V5IjoiYzNlOTI4MDUtMWEwMC00N2U3LWEzYTAtZjAyMzA2YzE1YjI3In0=
 no_total_adapters: 21

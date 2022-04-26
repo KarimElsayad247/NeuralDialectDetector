@@ -22,7 +22,7 @@ class InvSqrtLR(LambdaLR):
             mini_epoch_size=1,
             temperature=1,
     ):
-        assert max_factor == 1
+        # assert max_factor == 1
         self.num_warmup = num_warmup
         self.max_factor = max_factor
         self.min_factor = min_factor
@@ -63,12 +63,21 @@ class Trainer():
         tokenizer = AutoTokenizer.from_pretrained(self.model_name_path)
         model_config = AutoConfig.from_pretrained(self.model_name_path)
 
-        # Generate Loaders
-        train_loader, dev_loader, test_loader, no_labels, cls_weights = parse_and_generate_loaders(self.configs["path_to_data"], tokenizer, batch_size=self.configs["batch_size"], masking_percentage=self.configs["masking_percentage"], class_to_filter=self.configs["one_class_filtration"], filter_w_indexes=self.configs["indexes_filtration_path"], pred_class=self.configs["class_index"], use_regional_mapping=self.configs["use_regional_mapping"], max_seq_len=self.configs["max_sequence_length"], balance_data_max_examples=self.configs["max_ex_per_class"], is_province=self.configs["is_province"], is_MSA=self.configs["is_MSA"], sampler_imbalance=self.configs["handle_imbalance_sampler"])
+        # Generate Loaders // Ignore cls_weights, it's never used
+        train_loader, dev_loader, test_loader, no_labels, cls_weights = parse_and_generate_loaders(
+            self.configs["path_to_data"], tokenizer, batch_size=self.configs["batch_size"],
+            masking_percentage=self.configs["masking_percentage"],
+            class_to_filter=self.configs["one_class_filtration"],
+            filter_w_indexes=self.configs["indexes_filtration_path"],
+            pred_class=self.configs["class_index"],
+            use_regional_mapping=self.configs["use_regional_mapping"],
+            max_seq_len=self.configs["max_sequence_length"],
+            balance_data_max_examples=self.configs["max_ex_per_class"],
+            is_province=self.configs["is_province"], is_MSA=self.configs["is_MSA"],
+            sampler_imbalance=self.configs["handle_imbalance_sampler"])
         self.configs["num_labels"] = self.configs.get("num_labels", no_labels)
         self.configs["cls_weights"] = cls_weights
 
-        # model = AutoModel.from_pretrained(self.model_name_path)
         # Instantiate Model
         self.configs["mask_id"] = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
         model = getattr(model_classes, self.configs["model_class"]).from_pretrained(self.model_name_path,
@@ -276,7 +285,7 @@ class Trainer():
 if __name__ == "__main__":
 
     import sys
-    config_file_path = "/content/NeuralDialectDetector/config.yaml"  # sys.argv[1]
+    config_file_path = "MARBERT_DA_Country_Adapters_VAtt/config_model.yaml"  # sys.argv[1]
 
     trainer_class = Trainer(config_file_path=config_file_path)
     # trainer_class.train()
